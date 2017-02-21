@@ -3,11 +3,14 @@ version: 1.0.0-dev+1
 description: SQL-enabled services for the Angel framework. Works well with Furlong.
 author: Tobe O <thosakwe@gmail.com>
 homepage: https://github.com/angel-dart/angel_sqljocky
+environment:
+  sdk: ">=1.19.0"
 dependencies:
-  angel_framework: ">=1.0.0-dev < 2.0.0"
-  furlong: ">=1.0.0-dev <2.0.0"
-  json_god: ">=2.0.0-beta <3.0.0"
-  sqljocky: ">=0.14.1 <0.15.0"
+  angel_framework: ^1.0.0-dev
+  json_god: ^2.0.0-beta
+  sqljocky: ^0.14.1
 dev_dependencies:
-  http: ">= 0.11.3 < 0.12.0"
-  test: ">= 0.12.13 < 0.13.0"
+  angel_test: ^1.0.0-dev
+  furlong: ^1.0.0-dev
+  http: ^0.11.3
+  test: ^0.12.0

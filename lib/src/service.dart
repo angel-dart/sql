@@ -4,17 +4,28 @@ import 'package:json_god/json_god.dart' as god;
 import 'package:sqljocky/sqljocky.dart';
 
 /// Interacts with a SQL database via the Service API.
-///
-/// As of now, this service will ignore query parameters.
 class SqlJockyService extends Service {
-  bool _exists = false;
+  /// If set to `true`, parameters in `req.query` will be sent to the database.
+  /// 
+  /// We are using prepared queries, so as to prevent SQL injection attacks.
+  final bool allowQuery;
+
+  /// If set to `true`, clients can remove all items by passing a `null` `id` to `remove`.
+  ///
+  /// `false` by default.
+  final bool allowRemoveAll;
+
+  final bool debug;
+
   ConnectionPool connectionPool;
   String idField;
   String tableName;
-  Type outputType;
 
   SqlJockyService(this.connectionPool, this.tableName,
-      {this.idField: "", this.outputType})
+      {this.idField: "",
+      this.debug: false,
+      this.allowQuery: true,
+      this.allowRemoveAll})
       : super();
 
   _deserializeRow(Row row, [Map params]) {
