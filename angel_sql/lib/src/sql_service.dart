@@ -7,7 +7,7 @@ import 'package:angel_framework/angel_framework.dart';
 abstract class SqlService<Id, Data> extends Service<Id, Data> {
   /// A [Function] that turns a [Data] object into
   /// a set of substitution values that can be injected into a query.
-  final Map Function(Data) encoder;
+  final Map<String, dynamic> Function(Data) encoder;
 
   /// A [Function] that deserializes a SQL row into a [Data] object.
   final Data Function(List) decoder;
@@ -96,7 +96,11 @@ abstract class SqlService<Id, Data> extends Service<Id, Data> {
 
   @override
   Future<Data> remove(Id id, [Map<String, dynamic> params]) {
-    // TODO: implement remove
-    return super.remove(id, params);
+    // TODO: removeAll
+    var query =
+        'DELETE FROM `$tableName` WHERE id = @id LIMIT 1 RETURNING ($fieldSet);';
+    return new Future.sync(() {
+      return row(query, {'id': convertId(id)});
+    }).then(decoder);
   }
 }
