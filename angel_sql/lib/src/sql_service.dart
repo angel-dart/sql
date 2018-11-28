@@ -69,8 +69,11 @@ abstract class SqlService<Id, Data> extends Service<Id, Data> {
 
   @override
   Future<List<Data>> readMany(List<Id> ids, [Map<String, dynamic> params]) {
-    // TODO: implement readMany
-    return super.readMany(ids, params);
+    var idSet = ids.join(', ');
+    var query = 'SELECT $fieldSet FROM `$tableName` WHERE id IN $idSet;';
+    return new Future.sync(() {
+      return rows(query, {});
+    }).then((l) => l.map(decoder).toList());
   }
 
   @override
