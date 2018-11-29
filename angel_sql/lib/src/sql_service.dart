@@ -36,11 +36,11 @@ abstract class SqlService<Id, Data> extends Service<Id, Data> {
   String _fieldSet;
 
   /// Executes a SQL query, and returns a single row.
-  FutureOr<List> row(String query, Map<String, dynamic> substitutionValues);
+  FutureOr<List> row(String fmtString, Map<String, dynamic> substitutionValues);
 
   /// Executes a SQL query, and returns multiple rows.
   FutureOr<List<List>> rows(
-      String query, Map<String, dynamic> substitutionValues);
+      String fmtString, Map<String, dynamic> substitutionValues);
 
   /// Converts an [id] into an [int], so that it can be injected as an ID into a SQL query.
   int convertId(Id id) => int.parse(id.toString());
