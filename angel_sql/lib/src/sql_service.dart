@@ -32,7 +32,7 @@ abstract class SqlService<Id, Data> extends Service<Id, Data> {
       {this.allowQuery, this.allowRemoveAll});
 
   /// The joined list of [fields] that is placed into every query.
-  String get fieldSet => _fieldSet ??= fields.map((s) => '`$s`').join(', ');
+  String get fieldSet => _fieldSet ??= fields.join(', ');
   String _fieldSet;
 
   /// Executes a SQL query, and returns a single row.
@@ -56,21 +56,30 @@ abstract class SqlService<Id, Data> extends Service<Id, Data> {
   @override
   Future<List<Data>> index([Map<String, dynamic> params]) {
     // TODO: implement index
-    return super.index(params);
+    return new Future.sync(() {
+      return rows('SELECT $fieldSet FROM $tableName;', {});
+    }).then((rows) {
+      return rows.map(decoder).toList();
+    });
   }
 
   @override
   Future<Data> read(Id id, [Map<String, dynamic> params]) {
-    var query = 'SELECT $fieldSet FROM `$tableName` WHERE id = @id LIMIT 1;';
+    var query = 'SELECT $fieldSet FROM $tableName WHERE id = @id LIMIT 1;';
     return new Future.sync(() {
       return row(query, {'id': convertId(id)});
-    }).then(decoder);
+    }).then((row) {
+      if (row == null)
+        throw new AngelHttpException.notFound(
+            message: 'No record found for ID $id');
+      return decoder(row);
+    });
   }
 
   @override
   Future<List<Data>> readMany(List<Id> ids, [Map<String, dynamic> params]) {
     var idSet = ids.join(', ');
-    var query = 'SELECT $fieldSet FROM `$tableName` WHERE id IN $idSet;';
+    var query = 'SELECT $fieldSet FROM $tableName WHERE id IN $idSet;';
     return new Future.sync(() {
       return rows(query, {});
     }).then((l) => l.map(decoder).toList());
@@ -98,7 +107,7 @@ abstract class SqlService<Id, Data> extends Service<Id, Data> {
   Future<Data> remove(Id id, [Map<String, dynamic> params]) {
     // TODO: removeAll
     var query =
-        'DELETE FROM `$tableName` WHERE id = @id LIMIT 1 RETURNING ($fieldSet);';
+        'DELETE FROM $tableName WHERE id = @id LIMIT 1 RETURNING ($fieldSet);';
     return new Future.sync(() {
       return row(query, {'id': convertId(id)});
     }).then(decoder);
